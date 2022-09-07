@@ -1,0 +1,36 @@
+---
+title: "Fastball Swing and Miss Heat Maps"
+output: html_document
+date: '2022-07-22'
+---
+
+```{r}
+library(RSQLite)
+library(DBI)
+db = dbConnect(SQLite(), dbname = "Statcast.sqlite")
+PData <- dbGetQuery(conn = db, "SELECT * FROM Statcast_Pitching")
+
+library(remotes)
+#install_github("bayesball/CalledStrike")
+
+
+library(tidyverse)
+library(baseballr)
+library(CalledStrike)
+```
+
+
+```{r}
+aboveavgveloff = miss_swing_plot(PData %>% filter(release_speed >= "95.6", pitch_type == 'FF'), title = "75th Percentile FB Velo")
+aboveavgveloff
+belowavgveloff = miss_swing_plot(PData %>% filter(release_speed <= "92.4", pitch_type == 'FF'), title = "25th Percentile FB Velo")
+belowavgveloff
+
+#install.packages("ggpubr")
+library(ggpubr)
+final<- ggarrange(belowavgveloff, aboveavgveloff,
+          labels = "2022 MLB Fastball Swing and Miss Heat Maps")
+final
+
+```
+
